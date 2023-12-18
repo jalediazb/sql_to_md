@@ -1,12 +1,13 @@
+require('dotenv').config();
 const mysql = require('mysql2');
 
 // create the connection to database
 const connection = mysql.createConnection({
   port: 3306,
-  host: 'localhost',
-  user: 'root',
-  database: 'bitnami_wordpress',
-  password: '54a30098e2'
+  host: '127.0.0.1',
+  user: process.env.DB_USER,
+  database: process.env.DB,
+  password: process.env.DB_PASS
 });
 
 connection.connect((err) => {
@@ -17,3 +18,11 @@ connection.connect((err) => {
   }
   console.log('Conexión exitosa a la base de datos MySQL');
 });
+
+connection.query(
+  'SELECT * FROM wp_comments',
+  function(err, results, fields) {
+    console.log(results); // results contains rows returned by server
+    console.log(fields); // fields contains extra meta data about results, if available
+  }
+);
