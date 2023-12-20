@@ -1,1 +1,0 @@
-Ficha2 para para ver como se ve el tema

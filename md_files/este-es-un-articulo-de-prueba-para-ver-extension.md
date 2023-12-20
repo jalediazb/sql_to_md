@@ -1,1 +1,0 @@
-Título Preliminar de un Artículo con la longitud adecuada para ello
