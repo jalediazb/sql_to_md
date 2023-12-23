@@ -2,6 +2,9 @@ require('dotenv').config();
 const mysql = require('mysql2');
 const fs = require('fs');
 const path = require("path");
+const sqlQuery = require("./sql_query")
+const { NodeHtmlMarkdown, NodeHtmlMarkdownOptions } = require("node-html-markdown")
+
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -21,45 +24,46 @@ connection.connect((err) => {
   console.log('Conexión exitosa a la base de datos MySQL');
 });
 
-const queryGetContent = `
-  SELECT
-    ID,
-    post_date,
-    post_modified,
-    post_title,
-    post_name,
-    post_excerpt,
-    post_parent,
-    post_content
-  FROM wp_posts
-  WHERE
-    post_status = 'publish'
-    AND post_type IN ('post', 'page')
-  `
+
 connection.query(
-  queryGetContent,
-  function(err, results, fields) {
+  sqlQuery.query,
+  function (err, results, fields) {
     if (err) console.log(err)
     //console.log(results); // results contains rows returned by server
 
-    // Eliminar ficheros anteriores
-    fs.readdirSync('md_files', (err, files) => {
-      if (err) console.log(err)
+    // Directorio donde se alojan los ficheros md
+    const mdFiles = 'md_files'
 
-      files.forEach(file => {
-        fs.unlink(path.join('md_files', file), (err) => {
-          if (err) throw err;
-        });
-      })
-    })
+    // Eliminar ficheros anteriores
+    const files = fs.readdirSync(mdFiles);
+    files.forEach(file => {
+      const filePlace = path.join(mdFiles, file);
+      fs.unlinkSync(filePlace);
+    });
+
 
     // Crear ficheros y añadir contenido
     for (item of results) {
-      console.log(item.post_title)
 
-      const data = `${item.post_title}`
+      const contenido_post = NodeHtmlMarkdown.translate(item.post_content)
+      
+      const data = `---
+layout: ${item.template === 'ficha.php' ? 'ficha' : item.template === 'page-minimal.php' ? 'minimal' : 'post'}
+title: '${item.post_title}'
+subtitle: '${item.template === 'ficha.php' ? '' : item.post_excerpt}'
+meta_title: '${item.seo_title != undefined ? item.seo_title : ''}'
+meta_description: '${item.seo_description != undefined ? item.seo_description : item.post_excerpt}'
+category: [${item.categories != undefined ? item.categories.split(",").map(category => `'${category}'`).join(",") : ''}]
+tags: [${item.tags != undefined ? item.tags.split(",").map(tag => `'${tag}'`).join(",") : ''}]
+featuredImage: /_images/calcular-pintura.jpg
+date: 2022-03-11
+---
 
-      fs.writeFileSync(`md_files/${item.post_name}.md`, data)
+
+${contenido_post}
+`
+
+      fs.writeFileSync(`md_files/${item.slug}.md`, data)
     }
   }
 );
