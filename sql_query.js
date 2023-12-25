@@ -11,7 +11,7 @@ exports.query = `
     posts.post_title,
     seo_title.meta_value AS seo_title,
     seo_description.meta_value AS seo_description,
-    featured_image_ID.meta_value AS featured_image,
+    featured_image_ID.meta_value AS featured_image_id,
     img.guid AS thumbnail_url,
     GROUP_CONCAT(DISTINCT tc.name) AS categories,
     GROUP_CONCAT(DISTINCT tt.name) AS tags,
