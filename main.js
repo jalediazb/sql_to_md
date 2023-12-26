@@ -68,6 +68,7 @@ tags: [${item.tags != undefined ? item.tags.split(",").map(tag => `'${tag}'`).jo
 featuredImage: ${item.thumbnail_url != null ? '/_images/' + item.thumbnail_url.match(regex)[1] : ''}
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
 updated: Last Modified
+permalink: /${item.parent_slug === null ? item.slug : item.parent_slug + '/' + item.slug}/
 ---
 
 ${contenido_post}`
