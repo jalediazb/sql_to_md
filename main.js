@@ -44,13 +44,13 @@ connection.query(
 
     // Crear ficheros y añadir contenido
     for (item of results) {
-      
+
       // Expresión regular para obtener el nombre de la imagen
       const regex = /\/([^\/]+)$/
 
       // Convertir HTML en Markdown
       const contenido_post = NodeHtmlMarkdown.translate(item.post_content)
-      
+
       // Fechas
       const año = item.post_date.getFullYear()
       const mes = item.post_date.getMonth() + 1
@@ -67,6 +67,7 @@ category: [${item.categories != undefined ? item.categories.split(",").map(categ
 tags: [${item.tags != undefined ? item.tags.split(",").map(tag => `'${tag}'`).join(",") : ''}]
 featuredImage: ${item.thumbnail_url != null ? '/_images/' + item.thumbnail_url.match(regex)[1] : ''}
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
+updated: Last Modified
 ---
 
 ${contenido_post}`
