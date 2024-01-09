@@ -63,9 +63,9 @@ title: '${item.post_title}'
 subtitle: '${item.template === 'ficha.php' ? '' : item.post_excerpt}'
 meta_title: '${item.seo_title != undefined ? item.seo_title : ''}'
 meta_description: '${item.seo_description != undefined ? item.seo_description : item.post_excerpt}'
-category: [${item.categories != undefined ? item.categories.split(",").map(category => `'${category}'`).join(",") : ''}]
-tags: [${item.tags != undefined ? item.tags.split(",").map(tag => `'${tag}'`).join(",") : ''}]
+tags: [${item.categories != undefined ? item.categories.split(",").map(category => `'${category}'`).join(",") : ''}]
 featuredImage: ${item.thumbnail_url != null ? '/_images/' + item.thumbnail_url.match(regex)[1] : ''}
+featuredImageAlt: '${item.alt_featured_img != null ? item.alt_featured_img : ''}'
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
 updated: Last Modified
 permalink: /${item.parent_slug === null ? item.slug : item.parent_slug + '/' + item.slug}/
