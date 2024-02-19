@@ -82,7 +82,7 @@ LEFT JOIN wp_postmeta AS featured_image_ID
     ON featured_image_ID.post_id = posts.ID
     AND featured_image_ID.meta_key = '_thumbnail_id'
 left join wp_postmeta as alt_featured_img
-	on alt_featured_img.post_id = featured_image_id.meta_value
+	on alt_featured_img.post_id = featured_image_ID.meta_value
 	and alt_featured_img.meta_key = '_wp_attachment_image_alt'
 LEFT JOIN wp_posts AS parent
     ON posts.post_parent = parent.ID
