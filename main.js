@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require("path");
 const sqlQuery = require("./sql_query")
 const { NodeHtmlMarkdown, NodeHtmlMarkdownOptions } = require("node-html-markdown")
-
+const replaceImageRoutesMarkdown = require("./replaceImageRoutesMarkdown")
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -23,6 +23,8 @@ connection.connect((err) => {
   }
   console.log('Conexión exitosa a la base de datos MySQL');
 });
+
+
 
 
 connection.query(
@@ -51,6 +53,8 @@ connection.query(
       // Convertir HTML en Markdown
       const contenido_post = NodeHtmlMarkdown.translate(item.post_content)
 
+      const contenidoCorregido = replaceImageRoutesMarkdown(contenido_post)
+
       // Fechas
       const año = item.post_date.getFullYear()
       const mes = item.post_date.getMonth() + 1
@@ -64,13 +68,13 @@ subtitle: '${item.template === 'ficha.php' ? '' : item.post_excerpt}'
 meta_title: '${item.seo_title != undefined ? item.seo_title : ''}'
 meta_description: '${item.seo_description != undefined ? item.seo_description : item.post_excerpt}'
 tags: [${item.categories != undefined ? item.categories.split(",").map(category => `'${category}'`).join(",") : ''}]
-featuredImage: ${item.thumbnail_url != null ? '/_images/' + item.thumbnail_url.match(regex)[1] : ''}
+featuredImage: ${item.thumbnail_url != null ? item.thumbnail_url.match(regex)[1] : ''}
 featuredImageAlt: '${item.alt_featured_img != null ? item.alt_featured_img : ''}'
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
 permalink: /${item.parent_slug === null ? item.slug : item.parent_slug + '/' + item.slug}/
 ---
 
-${contenido_post}`
+${contenidoCorregido}`
 
       // Creamos cada fichero
       fs.writeFileSync(`md_files/${item.slug}.md`, data)
