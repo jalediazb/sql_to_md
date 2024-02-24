@@ -24,7 +24,22 @@ connection.connect((err) => {
   console.log('Conexión exitosa a la base de datos MySQL');
 });
 
+function obtenerJerarquiaSlug(postsArray, postId) {
+  let slug = '';
+  let parentId = postId;
 
+  while (parentId !== 0) {
+      const parentPost = postsArray.find(post => post.ID === parentId);
+      if (parentPost) {
+          slug = parentPost.slug + '/' + slug;
+          parentId = parentPost.post_parent;
+      } else {
+          parentId = 0;
+      }
+  }
+
+  return slug;
+}
 
 
 connection.query(
@@ -43,9 +58,16 @@ connection.query(
       fs.unlinkSync(filePlace);
     });
 
+    results.forEach(post => {
+      post.fullSlug = obtenerJerarquiaSlug(results, post.post_parent) + post.slug;
+    });
+
 
     // Crear ficheros y añadir contenido
     for (item of results) {
+
+      console.log(item.fullSlug)
+
 
       // Expresión regular para obtener el nombre de la imagen
       const regex = /\/([^\/]+)$/
@@ -71,7 +93,7 @@ tags: [${item.categories != undefined ? item.categories.split(",").map(category 
 featuredImage: ${item.thumbnail_url != null ? item.thumbnail_url.match(regex)[1] : ''}
 featuredImageAlt: '${item.alt_featured_img != null ? item.alt_featured_img : ''}'
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
-permalink: /${item.parent_slug === null ? item.slug : item.parent_slug + '/' + item.slug}/
+permalink: /${item.fullSlug}/
 ---
 
 ${contenidoCorregido}`
