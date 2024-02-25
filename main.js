@@ -5,6 +5,7 @@ const path = require("path");
 const sqlQuery = require("./sql_query")
 const { NodeHtmlMarkdown, NodeHtmlMarkdownOptions } = require("node-html-markdown")
 const replaceImageRoutesMarkdown = require("./replaceImageRoutesMarkdown")
+const removeFeaturedImg = require('./remove-featured-img')
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -66,7 +67,7 @@ connection.query(
     // Crear ficheros y añadir contenido
     for (item of results) {
 
-      console.log(item.fullSlug)
+      //console.log(item.fullSlug)
 
 
       // Expresión regular para obtener el nombre de la imagen
@@ -76,6 +77,19 @@ connection.query(
       const contenido_post = NodeHtmlMarkdown.translate(item.post_content)
 
       const contenidoCorregido = replaceImageRoutesMarkdown(contenido_post)
+
+      // Eliminar imagen predeterminada de contenido si existe
+
+      //console.log(item.thumbnail_url.match(regex)[1])
+
+      let contenidoCorregidoImg = ''
+
+      if (item.thumbnail_url != null) {
+        contenidoCorregidoImg = removeFeaturedImg(item.thumbnail_url.match(regex)[1], contenidoCorregido)
+      } else {
+        contenidoCorregidoImg = contenidoCorregido
+      }
+
 
       // Fechas
       const año = item.post_date.getFullYear()
@@ -96,7 +110,7 @@ date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
 permalink: /${item.fullSlug}/
 ---
 
-${contenidoCorregido}`
+${contenidoCorregidoImg}`
 
       // Creamos cada fichero
       fs.writeFileSync(`md_files/${item.slug}.md`, data)
