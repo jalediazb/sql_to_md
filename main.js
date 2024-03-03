@@ -96,14 +96,24 @@ connection.query(
       const mes = item.post_date.getMonth() + 1
       const día = item.post_date.getDate()
 
+      let tags = []
+      //Etiquetas
+      if (item.categories) {
+        tags = item.categories.split(",").map(category => `'${category}'`).join(",")
+        // Añadimos especies de madera
+        if (tags.includes('Especies de Madera')) {
+          tags = [tags, item.tags]
+        }
+      }
+
       // Contenido de Fichero Markdown
       const data = `---
 layout: ${item.template === 'ficha.php' ? 'ficha' : item.template === 'page-minimal.php' ? 'minimal' : 'post'}
 title: '${item.post_title}'
-subtitle: '${item.template === 'ficha.php' ? '' : item.post_excerpt}'
+subtitle: '${item.post_excerpt}'
 meta_title: '${item.seo_title != undefined ? item.seo_title : ''}'
 meta_description: '${item.seo_description != undefined ? item.seo_description : item.post_excerpt}'
-tags: [${item.categories != undefined ? item.categories.split(",").map(category => `'${category}'`).join(",") : ''}]
+tags: [${tags}]
 featuredImage: ${item.thumbnail_url != null ? item.thumbnail_url.match(regex)[1] : ''}
 featuredImageAlt: '${item.alt_featured_img != null ? item.alt_featured_img : ''}'
 date: ${año}-${mes < 10 ? '0' + mes : mes}-${día < 10 ? '0' + día : día}
